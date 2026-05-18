@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+crawl_checkpoint.jsonl
+crawl_errors.jsonl
+fill_empty_days_from_web.log.jsonl
+
+*.tmp
