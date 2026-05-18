@@ -2,7 +2,19 @@
 
 Kho dữ liệu này chứa thông tin ngày tốt xấu, giờ hoàng đạo, giờ hắc đạo và các mục lịch âm được crawl từ các website tra cứu lịch âm Việt Nam.
 
-Dữ liệu được chia theo năm trong thư mục `output_by_year/`, mỗi file JSON tương ứng một năm dương lịch. Kho hiện có 301 file cho giai đoạn 1900-2200, với tổng cộng 109.938 bản ghi ngày.
+Dữ liệu được chia theo năm trong thư mục `output_by_year/` và theo từng ngày trong thư mục `output_by_date/`. Kho hiện có 301 file theo năm cho giai đoạn 1900-2200, với tổng cộng 109.938 bản ghi ngày.
+
+## Mục lục
+
+- [Cấu trúc thư mục](#cấu-trúc-thư-mục)
+- [Định dạng dữ liệu](#định-dạng-dữ-liệu)
+- [Sử dụng như API tĩnh](#sử-dụng-như-api-tĩnh)
+- [Giải thích các trường](#giải-thích-các-trường)
+- [Nguồn dữ liệu](#nguồn-dữ-liệu)
+- [Cách chạy crawler](#cách-chạy-crawler)
+- [Chuẩn hóa diễn giải tiếng Việt](#chuẩn-hóa-diễn-giải-tiếng-việt)
+- [Chất lượng dữ liệu](#chất-lượng-dữ-liệu)
+- [Miễn trừ trách nhiệm](#miễn-trừ-trách-nhiệm)
 
 ## Cấu trúc thư mục
 
@@ -11,23 +23,32 @@ Dữ liệu được chia theo năm trong thư mục `output_by_year/`, mỗi fi
 +-- crawl_xemlicham.py
 +-- fill_empty_days_from_web.py
 +-- normalize_confusing_vietnamese.py
++-- split_by_date.py
 +-- output_by_year/
 |   +-- du_lieu_ngay_tot_xau_1900.json
 |   +-- du_lieu_ngay_tot_xau_1901.json
 |   +-- ...
++-- output_by_date/
+|   +-- 1900/
+|   |   +-- 01/
+|   |   |   +-- 01.json
+|   |   |   +-- 02.json
+|   |   |   +-- ...
 +-- README.md
 ```
 
 Trong đó:
 
 - `output_by_year/du_lieu_ngay_tot_xau_<nam>.json`: dữ liệu ngày tốt xấu theo từng năm dương lịch.
+- `output_by_date/<nam>/<thang>/<ngay>.json`: dữ liệu ngày tốt xấu theo từng ngày, thuận tiện để dùng như API tĩnh trên GitHub.
 - `crawl_xemlicham.py`: script crawl dữ liệu ban đầu từ `xemlicham.com`.
 - `fill_empty_days_from_web.py`: script bổ sung các ngày còn thiếu/rỗng bằng nguồn tham chiếu phụ.
 - `normalize_confusing_vietnamese.py`: script chuẩn hóa một số câu tiếng Việt khó hiểu, tối nghĩa hoặc dễ gây hiểu nhầm trong dữ liệu đã crawl.
+- `split_by_date.py`: script tách dữ liệu từ `output_by_year/` sang cấu trúc từng ngày trong `output_by_date/`.
 
 ## Định dạng dữ liệu
 
-Mỗi file JSON là một object, trong đó key cấp cao nhất là ngày dương lịch theo định dạng `YYYY-MM-DD`. Giá trị của mỗi ngày là object gồm 11 trường văn bản.
+Trong `output_by_year/`, mỗi file JSON là một object, trong đó key cấp cao nhất là ngày dương lịch theo định dạng `YYYY-MM-DD`. Giá trị của mỗi ngày là object gồm 11 trường văn bản.
 
 Ví dụ rút gọn:
 
@@ -48,6 +69,97 @@ Ví dụ rút gọn:
   }
 }
 ```
+
+Trong `output_by_date/`, mỗi file ngày chỉ chứa trực tiếp object dữ liệu của ngày đó, không bọc thêm key `YYYY-MM-DD`.
+
+Ví dụ rút gọn cho `output_by_date/1900/01/01.json`:
+
+```json
+{
+  "gio_hoang_dao": "...",
+  "gio_hac_dao": "...",
+  "cac_ngay_ky": "...",
+  "ngu_hanh": "...",
+  "banh_to_bach_ky_nhat": "...",
+  "khong_minh_luc_dieu": "...",
+  "nhi_thap_bat_tu": "...",
+  "thap_nhi_kien_tru": "...",
+  "ngoc_hap_thong_thu": "...",
+  "huong_xuat_hanh": "...",
+  "gio_xuat_hanh_theo_ly_thuan_phong": "..."
+}
+```
+
+## Sử dụng như API tĩnh
+
+Repo có thể được dùng trực tiếp như API tĩnh thông qua `raw.githubusercontent.com` hoặc jsDelivr. Với cách này không cần backend; ứng dụng chỉ cần gọi đúng đường dẫn JSON.
+
+### Lấy dữ liệu theo năm
+
+Raw GitHub:
+
+```text
+https://raw.githubusercontent.com/ILamTH/du-lieu-ngay-tot-xau/main/output_by_year/du_lieu_ngay_tot_xau_2025.json
+```
+
+jsDelivr:
+
+```text
+https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@main/output_by_year/du_lieu_ngay_tot_xau_2025.json
+```
+
+Ví dụ JavaScript lấy dữ liệu của một ngày từ file năm:
+
+```js
+async function getDayFromYearFile(date) {
+  const year = date.slice(0, 4);
+  const url = `https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@main/output_by_year/du_lieu_ngay_tot_xau_${year}.json`;
+  const data = await fetch(url).then((response) => response.json());
+
+  return data[date];
+}
+
+getDayFromYearFile("2025-01-01").then(console.log);
+```
+
+### Lấy dữ liệu theo ngày
+
+Raw GitHub:
+
+```text
+https://raw.githubusercontent.com/ILamTH/du-lieu-ngay-tot-xau/main/output_by_date/2025/01/01.json
+```
+
+jsDelivr:
+
+```text
+https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@main/output_by_date/2025/01/01.json
+```
+
+Ví dụ JavaScript lấy trực tiếp một ngày:
+
+```js
+async function getDay(date) {
+  const [year, month, day] = date.split("-");
+  const url = `https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@main/output_by_date/${year}/${month}/${day}.json`;
+
+  return fetch(url).then((response) => {
+    if (!response.ok) {
+      throw new Error(`Không tìm thấy dữ liệu cho ngày ${date}`);
+    }
+
+    return response.json();
+  });
+}
+
+getDay("2025-01-01").then(console.log);
+```
+
+Gợi ý sử dụng:
+
+- Dùng `output_by_date/` khi ứng dụng chỉ cần tra cứu từng ngày, vì mỗi request tải ít dữ liệu hơn.
+- Dùng `output_by_year/` khi ứng dụng cần đọc nhiều ngày trong cùng một năm, ví dụ hiển thị lịch tháng hoặc cache dữ liệu cả năm.
+- Với ứng dụng public, jsDelivr thường phù hợp hơn vì có CDN cache. Với nhu cầu kiểm tra nhanh file gốc trên GitHub, có thể dùng `raw.githubusercontent.com`.
 
 ## Giải thích các trường
 
@@ -107,6 +219,12 @@ Chuẩn hóa lại các câu tiếng Việt khó hiểu trong dữ liệu đã c
 
 ```bash
 python normalize_confusing_vietnamese.py
+```
+
+Tách dữ liệu theo từng ngày:
+
+```bash
+python split_by_date.py --compact
 ```
 
 Lưu ý: crawler có delay, retry và phụ thuộc vào cấu trúc HTML của website nguồn. Nếu website thay đổi giao diện, parser có thể cần cập nhật.
