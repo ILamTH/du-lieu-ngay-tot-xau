@@ -12,6 +12,7 @@ def split_by_date(input_dir: Path, output_dir: Path, indent: int | None) -> tupl
     day_count = 0
 
     for year_file in year_files:
+        print(year_file)
         year = year_file.stem.rsplit("_", 1)[-1]
         if not (year.isdigit() and len(year) == 4):
             raise ValueError(f"Cannot parse year from file name: {year_file.name}")

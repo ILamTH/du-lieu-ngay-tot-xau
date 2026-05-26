@@ -66,6 +66,12 @@ REPLACEMENTS = {
     "Tránh xuất hành hướng Lên Trời gặp Hạc Thần (xấu)": (
         "Hạc Thần là sao xấu, nhưng ngày này Hạc Thần ở trên trời nên không xác định hướng cụ thể để tránh."
     ),
+    r"\n-\n": (
+        r"\n- "
+    ),
+    r"\n:": (
+        r":"
+    )
 }
 
 
@@ -74,6 +80,7 @@ def main() -> None:
     total_replacements = 0
 
     for path in sorted(OUTPUT_DIR.glob("*.json")):
+        print(path)
         text = path.read_text(encoding="utf-8")
         original = text
         file_replacements = 0
