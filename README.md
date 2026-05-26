@@ -99,13 +99,13 @@ Repo có thể được dùng trực tiếp như API tĩnh thông qua `raw.githu
 Raw GitHub:
 
 ```text
-https://raw.githubusercontent.com/ILamTH/du-lieu-ngay-tot-xau/main/output_by_year/du_lieu_ngay_tot_xau_2025.json
+https://raw.githubusercontent.com/ILamTH/du-lieu-ngay-tot-xau/v1.0.0/output_by_year/du_lieu_ngay_tot_xau_2025.json
 ```
 
 jsDelivr:
 
 ```text
-https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@main/output_by_year/du_lieu_ngay_tot_xau_2025.json
+https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@v1.0.0/output_by_year/du_lieu_ngay_tot_xau_2025.json
 ```
 
 Ví dụ JavaScript lấy dữ liệu của một ngày từ file năm:
@@ -113,7 +113,7 @@ Ví dụ JavaScript lấy dữ liệu của một ngày từ file năm:
 ```js
 async function getDayFromYearFile(date) {
   const year = date.slice(0, 4);
-  const url = `https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@main/output_by_year/du_lieu_ngay_tot_xau_${year}.json`;
+  const url = `https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@v1.0.0/output_by_year/du_lieu_ngay_tot_xau_${year}.json`;
   const data = await fetch(url).then((response) => response.json());
 
   return data[date];
@@ -127,13 +127,13 @@ getDayFromYearFile("2025-01-01").then(console.log);
 Raw GitHub:
 
 ```text
-https://raw.githubusercontent.com/ILamTH/du-lieu-ngay-tot-xau/main/output_by_date/2025/01/01.json
+https://raw.githubusercontent.com/ILamTH/du-lieu-ngay-tot-xau/v1.0.0/output_by_date/2025/01/01.json
 ```
 
 jsDelivr:
 
 ```text
-https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@main/output_by_date/2025/01/01.json
+https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@v1.0.0/output_by_date/2025/01/01.json
 ```
 
 Ví dụ JavaScript lấy trực tiếp một ngày:
@@ -141,7 +141,7 @@ Ví dụ JavaScript lấy trực tiếp một ngày:
 ```js
 async function getDay(date) {
   const [year, month, day] = date.split("-");
-  const url = `https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@main/output_by_date/${year}/${month}/${day}.json`;
+  const url = `https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@v1.0.0/output_by_date/${year}/${month}/${day}.json`;
 
   return fetch(url).then((response) => {
     if (!response.ok) {
