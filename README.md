@@ -7,13 +7,11 @@ Bộ dữ liệu hiện có:
 - **301** file JSON theo năm trong `output_by_year/`.
 - **109.938** file JSON theo ngày trong `output_by_date/`.
 - **109.938** bản ghi ngày, phủ đủ mọi ngày dương lịch từ `1900-01-01` đến `2200-12-31`.
-- Mỗi bản ghi có **13 trường**: 11 trường diễn giải lịch âm dạng văn bản, `day_quality` và `can_chi`.
 
 > Lưu ý: nội dung ngày tốt/xấu, giờ hoàng đạo, phong thủy và xuất hành là thông tin văn hóa/tín ngưỡng dân gian, chỉ nên dùng để tham khảo.
 
 ## Mục lục
 
-- [Tính năng chính](#tính-năng-chính)
 - [Cấu trúc repository](#cấu-trúc-repository)
 - [Định dạng dữ liệu](#định-dạng-dữ-liệu)
 - [Giải thích các trường](#giải-thích-các-trường)
@@ -26,15 +24,6 @@ Bộ dữ liệu hiện có:
 - [Kiểm tra chất lượng dữ liệu](#kiểm-tra-chất-lượng-dữ-liệu)
 - [Lưu ý sử dụng và miễn trừ trách nhiệm](#lưu-ý-sử-dụng-và-miễn-trừ-trách-nhiệm)
 - [Đóng góp](#đóng-góp)
-
-## Tính năng chính
-
-- Tra cứu theo **năm dương lịch**: tải một file để đọc nhiều ngày trong cùng năm.
-- Tra cứu theo **ngày dương lịch**: tải một file nhỏ cho đúng ngày cần dùng.
-- Có phân loại tổng quát `day_quality` với 3 giá trị: `good`, `bad`, `normal`.
-- Có thông tin `can_chi` tách cấu trúc theo ngày/tháng/năm âm lịch.
-- Giữ lại các diễn giải nhiều dòng của dữ liệu gốc để không làm mất ngữ cảnh.
-- Có script crawl, bổ sung ngày rỗng, chuẩn hóa câu tiếng Việt, enrich thêm trường và tách dữ liệu theo ngày.
 
 ## Cấu trúc repository
 
@@ -158,20 +147,20 @@ Các trường văn bản có thể chứa ký tự xuống dòng `\n`, dấu g�
 
 ## Sử dụng như API tĩnh
 
-Bạn có thể dùng trực tiếp URL raw GitHub hoặc CDN jsDelivr. Khi dùng CDN, nên pin theo tag/commit để tránh dữ liệu thay đổi ngoài ý muốn.
+Bạn có thể dùng trực tiếp URL raw GitHub hoặc CDN jsDelivr. 
 
 ### Lấy dữ liệu theo năm
 
 Raw GitHub:
 
 ```text
-https://raw.githubusercontent.com/ILamTH/du-lieu-ngay-tot-xau/v1.0.0/output_by_year/du_lieu_ngay_tot_xau_2025.json
+https://raw.githubusercontent.com/ILamTH/du-lieu-ngay-tot-xau/main/output_by_year/du_lieu_ngay_tot_xau_2025.json
 ```
 
 jsDelivr:
 
 ```text
-https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@v1.0.0/output_by_year/du_lieu_ngay_tot_xau_2025.json
+https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@main/output_by_year/du_lieu_ngay_tot_xau_2025.json
 ```
 
 ### Lấy dữ liệu theo ngày
@@ -179,20 +168,19 @@ https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@v1.0.0/output_by_year/du
 Raw GitHub:
 
 ```text
-https://raw.githubusercontent.com/ILamTH/du-lieu-ngay-tot-xau/v1.0.0/output_by_date/2025/01/01.json
+https://raw.githubusercontent.com/ILamTH/du-lieu-ngay-tot-xau/main/output_by_date/2025/01/01.json
 ```
 
 jsDelivr:
 
 ```text
-https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@v1.0.0/output_by_date/2025/01/01.json
+https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@main/output_by_date/2025/01/01.json
 ```
 
 Gợi ý lựa chọn:
 
 - Dùng `output_by_date/` nếu ứng dụng chỉ tra cứu từng ngày riêng lẻ.
 - Dùng `output_by_year/` nếu ứng dụng cần cache cả năm, hiển thị lịch tháng hoặc lọc nhiều ngày trong cùng năm.
-- Dùng tag hoặc commit SHA thay cho branch động nếu cần dữ liệu ổn định trong production.
 
 ## Ví dụ tích hợp
 
@@ -201,7 +189,7 @@ Gợi ý lựa chọn:
 ```js
 async function getDayFromYearFile(date) {
   const year = date.slice(0, 4);
-  const url = `https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@v1.0.0/output_by_year/du_lieu_ngay_tot_xau_${year}.json`;
+  const url = `https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@main/output_by_year/du_lieu_ngay_tot_xau_${year}.json`;
   const data = await fetch(url).then((response) => response.json());
 
   return data[date] ?? null;
@@ -215,7 +203,7 @@ getDayFromYearFile("2025-01-01").then(console.log);
 ```js
 async function getDay(date) {
   const [year, month, day] = date.split("-");
-  const url = `https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@v1.0.0/output_by_date/${year}/${month}/${day}.json`;
+  const url = `https://cdn.jsdelivr.net/gh/ILamTH/du-lieu-ngay-tot-xau@main/output_by_date/${year}/${month}/${day}.json`;
 
   const response = await fetch(url);
   if (!response.ok) {
@@ -417,49 +405,7 @@ Theo kiểm tra hiện tại trong repo:
 | Khoảng năm | 1900-2200 |
 | Số file theo năm | 301 |
 | Số file theo ngày | 109.938 |
-| Tổng bản ghi ngày | 109.938 |
-| Bản ghi rỗng hoàn toàn | 0 |
-| Bản ghi có `day_quality` | 109.938 |
-| Bản ghi có `can_chi` | 109.938 |
-| Phân bố `day_quality = good` | 36.537 |
-| Phân bố `day_quality = bad` | 36.527 |
-| Phân bố `day_quality = normal` | 36.874 |
 
-Bạn có thể tự kiểm tra nhanh bằng script Python sau:
-
-```bash
-python - <<'PY'
-import collections
-import glob
-import json
-import os
-
-keys = collections.Counter()
-quality = collections.Counter()
-years = []
-records = 0
-empty = 0
-
-for path in sorted(glob.glob('output_by_year/*.json')):
-    year = int(os.path.basename(path).split('_')[-1].split('.')[0])
-    years.append(year)
-    with open(path, encoding='utf-8') as file:
-        data = json.load(file)
-
-    records += len(data)
-    for record in data.values():
-        keys.update(record.keys())
-        quality[record.get('day_quality', '<missing>')] += 1
-        if all(not str(value).strip() for value in record.values() if isinstance(value, str)):
-            empty += 1
-
-print('years:', min(years), max(years), len(years))
-print('records:', records)
-print('empty:', empty)
-print('quality:', dict(quality))
-print('keys:', sorted(keys))
-PY
-```
 
 Dù đã có kiểm tra tự động cơ bản, dữ liệu vẫn có thể còn sai sót do:
 
